@@ -127,8 +127,8 @@
       'responsive': true,
       'displayModeBar': false
     }
-    Plotly.plot('dowd_chart', data = dowd_graph, config = my_config); // call plotly's js method to place the plot in the div with the specified id
-    Plotly.plot('multi_chart', data = multi_graph, layout = {}, config = my_config);
+    Plotly.newPlot('dowd_chart', data = dowd_graph, config = my_config); // call plotly's js method to place the plot in the div with the specified id
+    Plotly.newPlot('multi_chart', data = multi_graph, config = my_config);
   </script>
 
   <script type='text/javascript'>

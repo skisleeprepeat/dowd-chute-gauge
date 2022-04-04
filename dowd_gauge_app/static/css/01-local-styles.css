@@ -1,5 +1,7 @@
 /* my styles */
 
+/* turn off the modebar here because it's not working in config */
+.modebar { display: none !important; }
 
 /* reduce spacing between plots */
 .chart {
