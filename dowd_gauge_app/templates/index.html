@@ -4,7 +4,7 @@
 <head>
   <!-- Required meta tags -->
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
 
   <title>Dowd Level</title>
   <!-- bootstrap 4 -->
@@ -54,7 +54,7 @@
       <!-- 7 day hydrograph for Dowd gauge feet level -->
       <div id='dowd_chart' class='chart responsive-plot text-center' style='max-height:400px; margin-top: 1vh !important;'></div>
       <!-- 7 day level for gauges upstream and downstream -->
-      <div id='multi_chart' class='chart responsive-plot' style='max-height:400px;  margin-top: 1vh !important;'></div>
+      <div id='multi_chart' class='chart responsive-plot text-center' style='max-height:400px;  margin-top: 1vh !important;'></div>
     </div>
     <hr>
   </div>
@@ -121,16 +121,8 @@
 
 < <!-- local plotly code -->
   <script type='text/javascript'>
-    var dowd_graph = {
-      {
-        dowdJSON | safe
-      }
-    }; // set the json data we passed for the graph to a variable
-    var multi_graph = {
-      {
-        multiJSON | safe
-      }
-    };
+    var dowd_graph = {{ dowdJSON | safe }}; // set the json data we passed for the graph to a variable
+    var multi_graph = {{  multiJSON | safe }};
     var my_config = {
       'responsive': true,
       'displayModeBar': false
