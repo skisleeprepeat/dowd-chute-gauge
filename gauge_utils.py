@@ -53,8 +53,14 @@ def estimate_dowd_level(dfw):
     ''' estimate Dowd Chute level using both equations for the 3 upstream gauges
     and for downstream gauge at avon'''
 
-    dfw['dowd_pred_up'] = round(0.0032415 * (dfw['09064600']+dfw['09065100']+dfw['09066510']) + 0.01419, 2)
-    dfw['dowd_pred_down'] = round(0.0027584 *dfw['09067020'] + 0.1674, 2)
+    print('estimating levels...')
+
+    # ols linear resgression fit
+    # dfw['dowd_pred_up'] = round(0.0032415 * (dfw['09064600']+dfw['09065100']+dfw['09066510']) + 0.01419, 2)
+    # dfw['dowd_pred_down'] = round(0.0027584 *dfw['09067020'] + 0.1674, 2)
+
+    # 3rd order polynomial regression fit
+    dfw['dowd_pred_down'] = round( -1.42 + 0.00915*dfw['09067020'] - 0.00000702*dfw['09067020']**2 + 0.0000000023 * dfw['09067020']**3, 2)
     print('estimated dowd levels dataframe:')
     print(dfw.tail())
     return dfw
@@ -115,12 +121,15 @@ def build_dowd_level_chart(dfw):
     fig.update_traces(line=dict(color="Blue", width=2))
 
     y_max = dfw['dowd_pred_down'].max()
+    y_min = dfw['dowd_pred_down'].min()
+    print(f'y min: {y_min}')
+    print(f'y max: {y_max}')
 
     fig.add_hrect(y0=6, y1=8, line_width=0, fillcolor="purple", opacity=0.25)
     fig.add_hrect(y0=4, y1=6, line_width=0, fillcolor="red", opacity=0.25)
     fig.add_hrect(y0=2, y1=4, line_width=0, fillcolor="yellow", opacity=0.25)
-    fig.add_hrect(y0=0.5, y1=2, line_width=0, fillcolor="green", opacity=0.25)
-    fig.add_hrect(y0=0, y1=0.5, line_width=0, fillcolor="grey", opacity=0.25)
+    fig.add_hrect(y0=0, y1=2, line_width=0, fillcolor="green", opacity=0.25)
+    fig.add_hrect(y0=y_min-0.5, y1=0, line_width=0, fillcolor="grey", opacity=0.25)
 
     fig.add_hline(y=0.5, line_width=0.5, line_dash="dash", line_color="white", opacity=0.5)
     fig.add_hline(y=1.5, line_width=0.5, line_dash="dash", line_color="white", opacity=0.5)
@@ -144,7 +153,7 @@ def build_dowd_level_chart(dfw):
     fig.update_yaxes(tickvals=[0,1,2,3,4,5,6,7,8,9,10,11],
                      ticks="outside",
                      ticklen=5)
-    fig.update_layout(yaxis_range=[0,max(y_max+1,5)]) #keep the y axis at 5 feet unless water is really high
+    fig.update_layout(yaxis_range=[min(y_min-0.5,0), max(y_max+1,5)]) #keep the y axis at 0-5 feet unless water is really high or low
     fig.update_layout(title_x=0.5) #center title
     fig.update_xaxes(
         tickformat="%m-%d",
