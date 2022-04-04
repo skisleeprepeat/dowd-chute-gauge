@@ -5,3 +5,29 @@
 .chart {
   margin-top: 1vh;
 }
+
+.remove-all-padding{
+margin:0 ! important;
+padding:0 ! important;
+}
+
+footer {
+  font-size: 0.8rem;
+}
+
+.headline {
+  padding: 1.2rem;
+}
+
+.text-status {
+  padding: 1.1rem;
+}
+
+a {
+  color: #b36200;
+  text-decoration: none;
+}
+
+.page-title {
+  color: #b36200;
+}

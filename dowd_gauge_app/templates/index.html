@@ -3,12 +3,18 @@
 
   <head>
     <meta charset="utf-8">
-    <title>Dowd</title>
-    <!-- bootstrap -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Dowd Level</title>
+    <!-- bootstrap 4 -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> -->
+
+
+    <!-- boostrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
     <!-- my styles (needs to be loaded after the plotly code to override it) -->
     <link rel='stylesheet', type='text/css' href="{{ url_for('static',filename='css/01-local-styles.css') }}" />
 
@@ -16,68 +22,77 @@
 
   <body>
 
-    <!-- create a div to hold the chart with specified id-->
-    <div class='container text-center'>
+    <!-- current level -->
 
-      <h1>Dowd Chute Virtual Gauge</h1>
-      <hr>
-      <div class='container'>
-          <h2>Current Level: {{ text_update[0] }}'</h2>
-          <p><i>(Last reading at {{ text_update[1] }})</i></p>
-          <!-- text level update -->
-          <div id='text-update'>
-            <p>Change in last hour of readings:  <strong>{{ text_update[2] }}&apos;</strong></p>
-            {% autoescape false %}
-            <p>{{ text_update[3] }}</p>
-            {% endautoescape %}
-          </div>
-          <div>
-            <a href="https://www.americanwhitewater.org/content/River/view/river-detail/4266/main" target="_blank">
-              Dowd Chute paddling beta from American Whitewater
-            </a>
-          </div>
+      <!-- yesterday's levels, 7-day history charts-->
+    <div class='headline text-center bg-dark text-white'>
+      <h1 class='page-title display-2'>Dowd Chute Virtual Gauge</h1>
+      <h2 class='display-3'>Current Level: {{ text_update[0] }}'</h2>
+      <p><i>(Last available reading at {{ text_update[1] }})</i></p>
+    </div>
+
+    <div class='text-status text-center'>
+      <!-- text level update -->
+      <div id='text-update'>
+        <p>Change in last hour of readings:  <strong>{{ text_update[2] }}&apos;</strong></p>
+        {% autoescape false %}
+        <p>{{ text_update[3] }}</p>
+        {% endautoescape %}
+
       </div>
-
+      <p>
+        <a href="https://www.americanwhitewater.org/content/River/view/river-detail/4266/main" target="_blank">
+          Dowd Chute paddling beta from American Whitewater
+        </a>
+      </p>
       <hr>
-      <div class='container'>
-        <h2>7-day Flow History</h2>
+      <div class='history-charts'>
+        <h2 class='fs-3'>7-day Flow History</h2>
         <!-- 7 day hydrograph for Dowd gauge feet level -->
         <div id='dowd_chart' class='chart responsive-plot text-center' style='max-height:400px; margin-top: 1vh !important;'></div>
         <!-- 7 day level for gauges upstream and downstream -->
         <div id='multi_chart' class='chart responsive-plot' style='max-height:400px;  margin-top: 1vh !important;'></div>
       </div>
-
+      <hr>
     </div>
-    <br>
-    <div class='container'>
-      <p><strong>ACTION ALERT </strong> Did you know Dowd Chute takeout access
-        it uncertain because the Whiskey Creek State Trust Land is leased by CPW
-        and their State Wildlife Areas are technically only open to
-        wildlife-related uses?  If access at or near River Run is lost,
-        lunch-laps and after-work laps on the Chute may require paddling all
-        the way to Avon. If you value open access below Dowd Chute and
-        would like to see a better takeout and secure long term access, contact your
-        county staff at <a href="https://www.eaglecounty.us/openspace">Eagle
-        County Open Space</a> and drop them a friendly message letting them
-        know access is important to you and you support a long term solution.
-      </p>
-      <p><strong>EAT YOUR BOATER VEGETABLES </strong> Do you know which
-        organization is constantly working for your recreational river access
-        and fighting to protect and restore river access and streamflows both
-        here in Colorado and nationwide?
-        <a href="https://www.americanwhitewater.org/" target="_blank">
-        American Whitewater</a> is the primary advocate for the preservation
-        and protection of whitewater rivers throughout the United States, and
-        connects the interests of human-powered recreational river users with
-        ecological and science-based data to achieve the goals within its mission.
-        Have you paid your dues for the year?  Have you paid your dues EVER?
-        Maybe its time to (wo)man up and actually contribute something to your
-        recreational community.  Click below to pay your goddamn dues today!
-      </p>
-      <div class='text-center'>
-        <p><em>Yes, I want to usefully contribute to society for once in my
-          life for less money than one night's bar tab in Vail: </em></p>
-        <p><a class="btn btn-secondary" href="https://membership.americanwhitewater.org/s/lightningmembership" target='_blank' role='button'>CLICK HERE TO PAY MY AMERICAN WHITEWATER DUES TODAY.</a></p>
+
+
+
+    <div>
+      <h2 class = 'text-center fs-3'>Current Issues</h2>
+      <div class='container'>
+        <p><strong>ACTION ALERT </strong> Did you know long term Dowd Chute
+          takeout access is currently uncertain because the Whiskey Creek State
+          Trust Land is leased by CPW and their State Wildlife Areas are
+          technically only open to wildlife-related uses?
+          If access at or near River Run is lost, lunch-laps and after-work laps
+          on the Chute may require paddling all the way to Avon.
+          If you value open access below Dowd Chute and would like to see a
+          better takeout and secure long term access, contact your
+          county staff at <a href="https://www.eaglecounty.us/openspace">Eagle
+          County Open Space</a> and drop them a friendly message letting them
+          know access is important to you and you support a long term solution.
+        </p>
+      </div>
+      <div class='container'>
+        <p><strong>EAT YOUR BOATER VEGETABLES </strong> Do you know which
+          organization works for your recreational river access
+          and fights to protect for river access and streamflows both
+          here in Colorado and nationwide?
+          <a href="https://www.americanwhitewater.org/" target="_blank">
+          American Whitewater</a> is the primary advocate for the preservation
+          and protection of whitewater rivers throughout the United States, and
+          connects the interests of human-powered recreational river users with
+          ecological and science-based data to achieve the goals within its mission.
+          Have you paid your dues for the year?  Have you paid your dues EVER?
+          Maybe its time to (wo)man up and actually contribute something to your
+          recreational community.  Click below to pay your goddamn dues today!
+        </p>
+        <div class='text-center'>
+          <p><em>Yes, I want to usefully contribute to society for once in my
+            life for less money than one night's bar tab in Vail: </em></p>
+          <p><a class="btn btn-secondary" href="https://membership.americanwhitewater.org/s/lightningmembership" target='_blank' role='button'>CLICK HERE TO PAY MY AMERICAN WHITEWATER DUES TODAY.</a></p>
+        </div>
       </div>
     </div>
 
