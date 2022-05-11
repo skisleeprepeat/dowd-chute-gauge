@@ -61,8 +61,8 @@ def estimate_dowd_level(dfw):
 
     # 3rd order polynomial regression fit
     dfw['dowd_pred_down'] = round( -1.42 + 0.00915*dfw['09067020'] - 0.00000702*dfw['09067020']**2 + 0.0000000023 * dfw['09067020']**3, 2)
-    print('estimated dowd levels dataframe:')
-    print(dfw.tail())
+    # print('estimated dowd levels dataframe:')
+    # print(dfw.tail())
     return dfw
 
 #-----------------------------------------------------------------------------
@@ -82,7 +82,7 @@ def get_text_levels(dfw):
       timestamp_hour_before_last = timestamp_last_reading - timedelta(hours=1)
       last_reading = dfw[dfw.index == timestamp_last_reading]['dowd_pred_down'].item()
       change_last_hour = dfw[dfw.index == timestamp_last_reading]['dowd_pred_down'].item() - dfw[dfw.index == timestamp_hour_before_last]['dowd_pred_down'].item()
-      change_last_hour = str(round(change_last_hour, 1))
+      change_last_hour = str(round(change_last_hour, 2))
     except:
       change_last_hour = 'not available'
 
@@ -95,10 +95,10 @@ def get_text_levels(dfw):
         # get the index value at the max and min flows (returns first row if more than one row is returned)
         peak_time = yesterday_data['dowd_pred_down'].idxmax()
         min_time =  yesterday_data['dowd_pred_down'].idxmin()
-        chute_peak_time = peak_time - timedelta(hours=1.5) # use approximately 90 minutes for water to travel from Gore Cr to Avon
-        chute_min_time = min_time - timedelta(hours=1.5)
-        yesterday_msg = (f"Yesterday's <strong>peak</strong> level of <strong>{peak_flow}&apos;</strong> occurred at {chute_peak_time.strftime('%I:%M %p')},<br>"
-                        f"Yesterday's <strong>low</strong> level of <strong>{min_flow}&apos;</strong> occurred at {chute_min_time.strftime('%I:%M %p')}")
+
+        yesterday_msg = (f"Yesterday's <strong>peak</strong> level of <strong>{peak_flow}&apos;</strong> occurred at {peak_time.strftime('%I:%M %p')},<br>"
+                        f"Yesterday's <strong>low</strong> level of <strong>{min_flow}&apos;</strong> occurred at {min_time.strftime('%I:%M %p')}")
+
     except:
         yesterday_msg = "Info on yesterday's min/max not available"
 
@@ -108,6 +108,8 @@ def get_text_levels(dfw):
 def build_dowd_level_chart(dfw):
 
     ''' create a hydrograph of estimated levels at dowd for last 7 days'''
+
+    print("Building Dowd chart")
 
     fig = px.line(dfw,
                   x=dfw.index,
@@ -122,8 +124,6 @@ def build_dowd_level_chart(dfw):
 
     y_max = dfw['dowd_pred_down'].max()
     y_min = dfw['dowd_pred_down'].min()
-    print(f'y min: {y_min}')
-    print(f'y max: {y_max}')
 
     fig.add_hrect(y0=6, y1=8, line_width=0, fillcolor="purple", opacity=0.25)
     fig.add_hrect(y0=4, y1=6, line_width=0, fillcolor="red", opacity=0.25)
@@ -171,6 +171,8 @@ def build_area_gauges_chart(df):
 
     '''return a plotly chart of hydrograph for all gauges for last 7 days'''
 
+    print("Building multi-gauge chart")
+
     plot_df = df
     # rename the site number columes with common local names
     # create plain-named aliases for gauges
@@ -180,7 +182,21 @@ def build_area_gauges_chart(df):
                  '09065100':'Cross Cr @ Mouth  ',
     }
     plot_df = plot_df.replace({"site_no": name_dict})
+
     # make the plot
+
+    # create lists of formatted dates for x-axis so that axis and hovertemplate can be formatted separately
+    # end_date = dt.today().strftime('%Y-%m-%d')
+    # start_date = (dt.today() - timedelta(7)).strftime('%Y-%m-%d')
+    end_date = dt.today()
+    start_date = (dt.today() - timedelta(7))
+    print(f'start: {start_date, end_date}')
+    # xtickvals = [dt.datetime(date) for date in range(start_date, end_date)]
+    xtickvals = [(start_date + timedelta(days = day)) for day in range(7)]
+    print(xtickvals)
+    xticktext = [val.strftime('%m-%d') for val in xtickvals]
+    print(xticktext)
+
     fig = px.line(plot_df,
               x="datetime",
               y="q",
@@ -209,8 +225,10 @@ def build_area_gauges_chart(df):
     )
     # format x-axis dates
     fig.update_xaxes(
-        tickformat="%m-%d",
-        tickangle = 67.5
+        tickformat="%m-%d %H:%M",
+        tickangle = 67.5,
+        ticktext=xticktext,
+        tickvals=xtickvals
     )
     # decrease the paper margin space around ove the plot to bring the title closer
     fig.update_layout(

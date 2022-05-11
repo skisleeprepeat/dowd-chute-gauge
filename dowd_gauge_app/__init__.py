@@ -27,7 +27,7 @@ def index():
     text_update = page_items_dict['text_info']
     dowd_fig = page_items_dict['dowd_hydrograph']
     multi_fig = page_items_dict['multi_hydrograph']
-    print(text_update)
+    # print(text_update)
     # print("dowd figure code is: ")
     # print(dowd_fig)
     # print("multi gauge figure code is: ")
