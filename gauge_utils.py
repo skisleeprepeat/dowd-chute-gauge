@@ -60,7 +60,9 @@ def estimate_dowd_level(dfw):
     # dfw['dowd_pred_down'] = round(0.0027584 *dfw['09067020'] + 0.1674, 2)
 
     # 3rd order polynomial regression fit
-    dfw['dowd_pred_down'] = round( -1.42 + 0.00915*dfw['09067020'] - 0.00000702*dfw['09067020']**2 + 0.0000000023 * dfw['09067020']**3, 2)
+    #dfw['dowd_pred_down'] = round( -1.42 + 0.00915*dfw['09067020'] - 0.00000702*dfw['09067020']**2 + 0.0000000023 * dfw['09067020']**3, 2)
+    # 4th order fit with some better high water data points
+    dfw['dowd_pred_down'] = round( -1.5 + 0.0109*dfw['09067020'] - 0.0000123*dfw['09067020']**2 + 0.00000000761 * dfw['09067020']**3 - 0.00000000000171 * dfw['09067020']**4, 2)
     # print('estimated dowd levels dataframe:')
     # print(dfw.tail())
     return dfw
