@@ -50,12 +50,20 @@
     </p>
 
     <hr>
-    <div class='history-charts'>
-      <h2 class='fs-3'>7-day Flow History</h2>
+    <div class='history-charts container'>
+
+      <h2 class='fs-3'>7-day Flow Histories</h2>
+
       <!-- 7 day hydrograph for Dowd gauge feet level -->
       <div id='dowd_chart' class='chart responsive-plot text-center' style='max-height:400px; margin-top: 1vh !important;'></div>
+      
       <!-- 7 day level for gauges upstream and downstream -->
-      <div id='multi_chart' class='chart responsive-plot text-center' style='max-height:400px;  margin-top: 1vh !important;'></div>
+      <!-- <div id='multi_chart' class='chart responsive-plot text-center' style='max-height:400px;  margin-top: 1vh !important;'></div> -->
+      <div id='upper_eagle_chart' class='chart responsive-plot text-center' style='max-height:400px;  margin-top: 1vh !important;'></div>
+      <div id='lower_eagle_chart' class='chart responsive-plot text-center' style='max-height:400px;  margin-top: 1vh !important;'></div>
+      <div id='colorado_chart' class='chart responsive-plot text-center' style='max-height:400px;  margin-top: 1vh !important;'></div>
+    
+    
     </div>
     <div class='text-center'>
       <a href="https://www.americanwhitewater.org/content/River/state-summary/state/CO/" target="_blank">
@@ -72,24 +80,27 @@
     <h2 class='text-center fs-3'>Current Issues</h2>
     <div class='container'>
 
-      <p><strong>GAUGE IMPROVEMENTS</strong>The gauge currently over-estimates
-        levels above 4' due to lack of good calibration points from high water
-        last year.  If you happen to be going by it and its around or above 5'
-        at any time in the next week, please snap a picture and send a level reading
-        and timestamp to me, thanks.
+      <p><strong>GAUGE CAVEATS</strong> The gauge currently has higher uncertainty 
+        at levels from 4'-5' due to lack of good calibration points from high water
+        last year.  It will not estimate above 5' with much accuracy at all until we 
+        get a new post mounted on the riverside and can get some new calibration points 
+        at higher levels.
       </p>
 
-      <p><strong>ACTION ALERT </strong> Did you know long term Dowd Chute
-        takeout access is currently uncertain because the Whiskey Creek State
-        Trust Land is leased by CPW and their State Wildlife Areas are
-        technically only open to wildlife-related uses?
+      <p><strong>ACTION ALERT </strong> <em>Did you know long term Dowd Chute
+        takeout access is currently on the chopping block?</em> When the ECO trail is 
+        completed from EagleVail to Dowd, CDOT has deterimined there will not be 
+        enough remaining room in the right-of-way near River Run bus stop, and the
+        parking will be removed at the top fo the stairs. Access is also uncertain 
+        because the Whiskey Creek State Trust Land is leased by CPW and their 
+        State Wildlife Areas are technically only open to wildlife-related uses.
         If access at or near River Run is lost, lunch-laps and after-work laps
         on the Chute may require paddling all the way to Avon.
         If you value open access below Dowd Chute and would like to see a
         better takeout and secure long term access, contact your
         county staff at <a href="https://www.eaglecounty.us/openspace">Eagle
           County Open Space</a> and drop them a friendly message letting them
-        know access is important to you and you support a long term solution.
+        know access is important to you and you support a secure long term solution.
       </p>
     </div>
     <div class='container'>
@@ -132,16 +143,25 @@
 <!-- Plotly library -->
 <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
 
-< <!-- local plotly code -->
+<!-- local plotly code -->
   <script type='text/javascript'>
     var dowd_graph = {{ dowdJSON | safe }}; // set the json data we passed for the graph to a variable
-    var multi_graph = {{  multiJSON | safe }};
+    // var multi_graph = {{  multiJSON | safe }};
+    var upper_eagle_graph = {{  upperEagleJSON | safe }};
+    var lower_eagle_graph = {{  lowerEagleJSON | safe }};
+    var colorado_graph = {{  coloradoJSON | safe }};
+    
+    
+    
     var my_config = {
       'responsive': true,
       'displayModeBar': false
     }
     Plotly.newPlot('dowd_chart', data = dowd_graph, config = my_config); // call plotly's js method to place the plot in the div with the specified id
-    Plotly.newPlot('multi_chart', data = multi_graph, config = my_config);
+    // Plotly.newPlot('multi_chart', data = multi_graph, config = my_config);
+    Plotly.newPlot('upper_eagle_chart', data = upper_eagle_graph, config = my_config);
+    Plotly.newPlot('lower_eagle_chart', data = lower_eagle_graph, config = my_config);
+    Plotly.newPlot('colorado_chart', data = colorado_graph, config = my_config);
   </script>
 
   <script type='text/javascript'>

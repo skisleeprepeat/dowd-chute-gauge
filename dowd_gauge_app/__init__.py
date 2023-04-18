@@ -26,20 +26,28 @@ def index():
     # unpack it for clarity of what the objects are
     text_update = page_items_dict['text_info']
     dowd_fig = page_items_dict['dowd_hydrograph']
-    multi_fig = page_items_dict['multi_hydrograph']
+    # multi_fig = page_items_dict['multi_hydrograph']
+    upper_eagle_fig = page_items_dict['upper_eagle_hydrograph']
+    lower_eagle_fig = page_items_dict['lower_eagle_hydrograph']
+    colorado_fig = page_items_dict['colorado_hydrograph']
     # print(text_update)
     # print("dowd figure code is: ")
     # print(dowd_fig)
-    # print("multi gauge figure code is: ")
-    # print(multi_fig)
 
     dowdJSON = json.dumps(dowd_fig, cls=plotly.utils.PlotlyJSONEncoder)
-    multiJSON = json.dumps(multi_fig, cls=plotly.utils.PlotlyJSONEncoder)
+    # multiJSON = json.dumps(multi_fig, cls=plotly.utils.PlotlyJSONEncoder)
+    upperEagleJSON = json.dumps(upper_eagle_fig, cls=plotly.utils.PlotlyJSONEncoder)
+    lowerEagleJSON = json.dumps(lower_eagle_fig, cls=plotly.utils.PlotlyJSONEncoder)
+    coloradoJSON = json.dumps(colorado_fig, cls=plotly.utils.PlotlyJSONEncoder)
 
     return render_template('index.html',
                             text_update=text_update,
                             dowdJSON=dowdJSON,
-                            multiJSON=multiJSON)
+                            # multiJSON=multiJSON,
+                            upperEagleJSON=upperEagleJSON,
+                            lowerEagleJSON=lowerEagleJSON,
+                            coloradoJSON=coloradoJSON
+                            )
 
 #-----------------------------------------------------------------------------
 

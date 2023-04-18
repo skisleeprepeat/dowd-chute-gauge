@@ -33,3 +33,7 @@ a {
 .page-title {
   color: #b36200;
 }
+
+.history-charts {
+  max-width: 1080px;
+}

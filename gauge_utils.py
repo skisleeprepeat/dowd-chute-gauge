@@ -5,7 +5,9 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 #----------------------------------------------------------------------------
-GAUGE_LIST = ['09067020','09064600','09066510','09065100']
+UPPER_EAGLE_GAUGE_LIST = ['09067020', '09064600', '09066510', '09065100']
+LOWER_EAGLE_GAUGE_LIST = ['394220106431500', '09070000']
+COLORADO_GAUGE_LIST = ['09058000', '09060799', '09070500']
 
 #-----------------------------------------------------------------------------
 # Functions used here within gauge_utils.py to make api calls, manipulate
@@ -19,6 +21,7 @@ def get_usgs_data(gauge_list):
     start_date = (dt.today() - timedelta(7)).strftime('%Y-%m-%d')
     param_cd = '00060'
 
+    print(f'Calling data for {gauge_list} for {start_date} to {end_date}')
     try:
         df = nwis.get_record(sites=gauge_list,
                              service='iv',
@@ -111,7 +114,7 @@ def build_dowd_level_chart(dfw):
 
     ''' create a hydrograph of estimated levels at dowd for last 7 days'''
 
-    print("Building Dowd chart")
+    print("\nBuilding Dowd chart\n")
 
     fig = px.line(dfw,
                   x=dfw.index,
@@ -169,11 +172,11 @@ def build_dowd_level_chart(dfw):
     return fig
 
 
-def build_area_gauges_chart(df):
+def build_area_gauges_chart(df, title_text):
 
     '''return a plotly chart of hydrograph for all gauges for last 7 days'''
 
-    print("Building multi-gauge chart")
+    print(f"\nBuilding multi-gauge chart for {title_text}")
 
     plot_df = df
     # rename the site number columes with common local names
@@ -182,8 +185,16 @@ def build_area_gauges_chart(df):
                  '09064600':'Eagle @ Tigiwon Rd',
                  '09066510':'Gore @ Mouth      ',
                  '09065100':'Cross Cr @ Mouth  ',
+                 '394220106431500':'Eagle @ Wolcott',
+                 '09070000': 'Eagle @ Gypsum',
+                 '09058000': 'Colorado @ Gore Canyon',
+                 '09060799': 'Colorado @ Catamount',
+                 '09070500': 'Colorado blw Dotsero<br>(Shoshone)'
     }
+
     plot_df = plot_df.replace({"site_no": name_dict})
+    print('\nplot datarame:\n')
+    print(plot_df.tail())
 
     # make the plot
 
@@ -192,12 +203,14 @@ def build_area_gauges_chart(df):
     # start_date = (dt.today() - timedelta(7)).strftime('%Y-%m-%d')
     end_date = dt.today()
     start_date = (dt.today() - timedelta(7))
-    print(f'start: {start_date, end_date}')
+    # print(f'start: {start_date, end_date}')
+
     # xtickvals = [dt.datetime(date) for date in range(start_date, end_date)]
     xtickvals = [(start_date + timedelta(days = day)) for day in range(7)]
-    print(xtickvals)
+    # print(xtickvals)
+
     xticktext = [val.strftime('%m-%d') for val in xtickvals]
-    print(xticktext)
+    # print(xticktext)
 
     fig = px.line(plot_df,
               x="datetime",
@@ -207,8 +220,9 @@ def build_area_gauges_chart(df):
                   "datetime": "",
                   "q": "Flow (cfs)",
                   },
-              title="Upper Eagle Gauges",
+              title=f"{title_text} Gauges",
               )
+    
     # hover controls and settings
     fig.update_traces(hovertemplate="%{y:.0f} cfs")
     fig.update_layout(hovermode="x unified")
@@ -239,7 +253,7 @@ def build_area_gauges_chart(df):
     fig.update_layout({
         'plot_bgcolor': 'rgba(204,209,217,0.25)'
         })
-
+    
     return fig
 
 #-----------------------------------------------------------------------------
@@ -247,30 +261,89 @@ def build_area_gauges_chart(df):
 
 def create_page_items():
 
+    # merge the gauge lists to make a single API call
+    GAUGE_LIST = UPPER_EAGLE_GAUGE_LIST + LOWER_EAGLE_GAUGE_LIST + COLORADO_GAUGE_LIST
+
+    # add code here to see if the data file exists/has been re-created within the last hour,
+    # if so, load it from the saved file, if not make a new API call for updated data
+    # 1) check timestamp of last update
+    # 2) if it is within last hour, load it into 'gauge_data'
+    # 3) if it is older, get updated data; or perhaps last 30 mins
+
     gauge_data = get_usgs_data(GAUGE_LIST)
 
+    # subset the returned gauge dataframe into individual dataframes for different charts
     try:
-        wide_data = reformat_data(gauge_data)
-        wide_data = estimate_dowd_level(wide_data)
+        upper_eagle_data = gauge_data.loc[gauge_data['site_no'].isin(UPPER_EAGLE_GAUGE_LIST)]
     except:
-        wide_data = None
+        upper_eagle_data = None
 
     try:
-        text_info = get_text_levels(wide_data)
+        lower_eagle_data = gauge_data.loc[gauge_data['site_no'].isin(LOWER_EAGLE_GAUGE_LIST)]
     except:
-        text_info = None
+        lower_eagle_data = None
 
     try:
-        dowd_hydrograph = build_dowd_level_chart(wide_data)
+        colorado_data = gauge_data.loc[gauge_data['site_no'].isin(COLORADO_GAUGE_LIST)]
+    except:
+        colorado_data = None
+
+
+    # try:
+    #     wide_data = reformat_data(gauge_data)
+    #     # wide_data = estimate_dowd_level(wide_data)
+    # except:
+    #     wide_data = None
+
+    # try:
+    #     text_info = get_text_levels(wide_data)
+    # except:
+    #     text_info = None
+    # print('\ntext info:\n')
+    # print(text_info)
+
+    try:
+        dowd_data = gauge_data.loc[gauge_data['site_no']=='09067020']
+        dowd_data_wide = reformat_data(dowd_data)
+        dowd_data_wide = estimate_dowd_level(dowd_data_wide)
+        dowd_hydrograph = build_dowd_level_chart(dowd_data_wide)
+        text_info = get_text_levels(dowd_data_wide)
     except:
         dowd_hydrograph = None
+        text_info = ['<err>','<err>','<err>','<err>']
+
+    # try:
+    #     multi_hydrograph = build_area_gauges_chart(gauge_data)
+    # except:
+    #     multi_hydrograph = None
+    
+    try:
+        upper_eagle_hydrograph = build_area_gauges_chart(
+            upper_eagle_data, 
+            title_text='Upper Eagle'
+            )
+    except:
+        upper_eagle_hydrograph = None
 
     try:
-        multi_hydrograph = build_area_gauges_chart(gauge_data)
+        lower_eagle_hydrograph = build_area_gauges_chart(
+            lower_eagle_data, 
+            title_text='Lower Eagle')
     except:
-        multi_hydrograph = None
+        lower_eagle_hydrograph = None
+    
+    try:
+        colorado_hydrograph = build_area_gauges_chart(
+            colorado_data, 
+            title_text='Upper Colorado')
+    except:
+        colorado_hydrograph = None
+
 
     return {'text_info': text_info,
             'dowd_hydrograph': dowd_hydrograph,
-            'multi_hydrograph': multi_hydrograph,
+            # 'multi_hydrograph': multi_hydrograph,
+            'upper_eagle_hydrograph': upper_eagle_hydrograph,
+            'lower_eagle_hydrograph': lower_eagle_hydrograph,
+            'colorado_hydrograph': colorado_hydrograph,
             }
